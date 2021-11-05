@@ -48,7 +48,9 @@ async function findById(scheme_id) {
   .where('sc.scheme_id', scheme_id)
 
   let result = { steps: [] }
+    // same as rows.forEach(step => {
 
+    // })
   for (let step of rows) {
     if(!result.scheme_id) {
       result.scheme_id = step.scheme_id
@@ -132,7 +134,19 @@ async function findById(scheme_id) {
   */
 }
 
-function findSteps(scheme_id) { // EXERCISE C
+async function findSteps(scheme_id) { 
+  const rows = await db('steps as st')
+  .join('schemes as sc', 'st.scheme_id', 'sc.scheme_id')
+  .select(
+    'st.step_id',
+    'st.step_number',
+    'st.instructions',
+    'sc.scheme_name'
+  )
+  .orderBy('st.step_number', "ASC")
+  .where('sc.scheme_id', scheme_id)
+  return rows
+  // EXERCISE C
   /*
     1C- Build a query in Knex that returns the following data.
     The steps should be sorted by step_number, and the array
