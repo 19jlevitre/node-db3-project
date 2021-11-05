@@ -21,7 +21,11 @@ async function find() { // EXERCISE A
  .leftJoin('steps as st', 'sc.scheme_id', 'st.scheme_id')
  .groupBy('sc.scheme_id')
 //  .orderBy('sc.scheme_id', 'ASC')
-.select('sc.scheme_id', 'sc.scheme_name', 'number_of_steps')
+  .select(
+    'sc.scheme_id',
+    'sc.scheme_name'
+  )
+
  .count('st.step_id as number_of_steps')
  
  
@@ -30,7 +34,37 @@ async function find() { // EXERCISE A
  
 }
 
-function findById(scheme_id) { // EXERCISE B
+async function findById(scheme_id) {
+  const rows = await db('schemes as sc')
+  .leftJoin('steps as st', 'sc.scheme_id', 'st.scheme_id')
+  .select(
+    'sc.scheme_id',
+    'sc.scheme_name',
+    'st.step_id',
+    'st.step_number',
+    'st.instructions'
+  )
+  .orderBy('st.step_number', 'ASC')
+  .where('sc.scheme_id', scheme_id)
+
+  let result = { steps: [] }
+
+  for (let step of rows) {
+    if(!result.scheme_id) {
+      result.scheme_id = step.scheme_id
+      result.scheme_name = step.scheme_name
+    }
+    if(step.step_id) {
+      result.steps.push({
+        step_id: step.step_id,
+        step_number: step.step_number,
+        instructions: step.instructions
+      })
+    }
+   
+  }
+    return result
+  // EXERCISE B
   /*
     1B- Study the SQL query below running it in SQLite Studio against `data/schemes.db3`:
 
