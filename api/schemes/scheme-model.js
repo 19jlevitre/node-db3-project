@@ -181,7 +181,20 @@ return await db('schemes').insert(scheme)
  
 }
 
-function addStep(scheme_id, step) { // EXERCISE E
+async function addStep(scheme_id, step) {
+  return db('steps').insert({
+    ...step,
+    scheme_id
+  })
+  .then(() => {
+    return db('steps as st')
+    .join('schemes as sc', 'sc.scheme_id', 'st.scheme_id')
+    .select('step_id', 'step_number', 'instructions', 'scheme_name')
+    .orderBy('st.step_number', 'ASC')
+    .where('sc.scheme_id', scheme_id)
+  })
+
+  // EXERCISE E
   /*
     1E- This function adds a step to the scheme with the given `scheme_id`
     and resolves to _all the steps_ belonging to the given `scheme_id`,
